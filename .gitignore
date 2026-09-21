@@ -1,0 +1,5 @@
+#Systeme
+.DS_Store
+
+#Config avec identifiants sensibles 
+config.php
