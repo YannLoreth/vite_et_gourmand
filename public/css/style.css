@@ -17,7 +17,7 @@ h1 {
   color: var(--couleur-vert-fonce);
 }
 
-h1, h2, h3, .navbar-brand, .nav-link{
+h1, h2, h3, .navbar-brand, .nav-link, footer{
   font-family: 'Poppins', sans-serif;
 }
 
@@ -28,11 +28,40 @@ h2 {
   margin-bottom: 1rem;
 }
 
-nav{
+nav, footer{
     background: var(--couleur-fond-sombre);
 }
 
 nav .navbar-brand,
-nav .nav-link{
+nav .nav-link,
+footer{
     color: var(--couleur-texte-clair);
+}
+
+nav .nav-link:hover,
+nav .navbar-brand:hover{
+  color: var(--couleur-vert-fonce) !important;
+}
+
+.row img.img-fluid {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+}
+.card {
+  border: none;
+  border-top: 3px solid var(--couleur-accent);
+}
+.card {
+  border: none;
+  border-top: 3px solid var(--couleur-accent);
+}
+h1, h2 {
+  letter-spacing: -0.02em;
+}
+p {
+  line-height: 1.8;
+}
+.rounded, .card {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
