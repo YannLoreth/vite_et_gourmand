@@ -4,3 +4,6 @@
 #Config avec identifiants sensibles 
 config.php
 .env
+
+#Outils et extentions VSCode
+.VSCode

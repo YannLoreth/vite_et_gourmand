@@ -1,3 +1,4 @@
+-- Active: 1740395167422@@127.0.0.1@3306
 
 CREATE DATABASE IF NOT EXISTS vite_et_gourmand
   CHARACTER SET utf8mb4
@@ -74,7 +75,6 @@ CREATE TABLE rel_plat_allergene
 rel_plat_allergene_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 plat_id INT NOT NULL,
 allergene_id INT NOT NULL,
-
 FOREIGN KEY (plat_id)
 REFERENCES plat(plat_id),
 FOREIGN KEY (allergene_id)
@@ -120,3 +120,45 @@ create table utilisateur
     REFERENCES roles(roles_id)
 );
 
+CREATE TABLE adresse_livraison
+(
+    adresse_livraison_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    adresse VARCHAR(100) NOT NULL,
+    code_postal VARCHAR(5) NOT NULL,
+    ville VARCHAR(100) NOT NULL
+);
+CREATE Table statut_commande
+(
+    statut_commande_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    libelle VARCHAR(100) NOT NULL
+);
+
+CREATE Table commande 
+(
+    numero_commande INT NOT NULL PRIMARY KEY AUTO_INCREMENT, 
+    date_commande DATE NOT NULL, 
+    date_prestation DATE NOT NULL, 
+    heure_livraison TIME NOT NULL, 
+    prix_menu DECIMAL(6,2) NOT NULL, 
+    nombre_personne INT NOT NULL, 
+    prix_livraison DECIMAL(6,2) NOT NULL, 
+    pret_materiel BOOLEAN NULL, 
+    restitution_materiel BOOLEAN NULL,
+    adresse_livraison_id INT NOT NULL,
+    utilisateur_id INT NOT NULL,
+    menu_id INT NOT NULL,
+    statut_commande_id INT NOT NULL,
+    Foreign Key (adresse_livraison_id) REFERENCES adresse_livraison(adresse_livraison_id),
+    Foreign Key (utilisateur_id) REFERENCES utilisateur(utilisateur_id),
+    Foreign Key (menu_id) REFERENCES menus(menu_id),
+    Foreign Key (statut_commande_id) REFERENCES statut_commande(statut_commande_id)
+);
+
+CREATE Table rel_plat_menu
+(
+    rel_plat_menu_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    plat_id INT NOT NULL,
+    menu_id INT NOT NULL,
+    Foreign Key (plat_id) REFERENCES plat(plat_id),
+    Foreign Key (menu_id) REFERENCES menus(menu_id)
+);
