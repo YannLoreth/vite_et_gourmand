@@ -111,10 +111,24 @@
     </div>
 </section>
 
-<footer class="text-center py-4 mt-5 mt-auto">
+<?php require_once __DIR__ . '/../src/horaires.php'; ?>
+
+<footer class="text-center py-1 mt-2">
   <div class="container">
-    <p>Du Lundi au Dimanche de 10h à 14h pour toutes questions</p>
-    <p>
+<div class="row">
+  <?php foreach ($horaires as $index => $ouverture): ?>
+    <?php if ($index % 2 === 0): ?>
+      <div class="col-3">
+    <?php endif; ?>
+
+    <p><?= $ouverture['libelle'] ?> : <?= $ouverture['horaire_ouverture'] ?> - <?= $ouverture['horaire_fermeture'] ?></p>
+
+    <?php if ($index % 2 === 1 || $index === count($horaires) - 1): ?>
+      </div>
+    <?php endif; ?>
+  <?php endforeach; ?>
+</div>
+    <p class="mt-2">
       <a href="#" class="text-white">lien mentions légales</a> |
       <a href="#" class="text-white">lien CGV </a>
     </p>
