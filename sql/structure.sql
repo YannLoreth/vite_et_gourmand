@@ -39,15 +39,6 @@ CREATE TABLE statut_avis
     libelle VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE avis
-(
-    avis_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    note INT NOT NULL,
-    commentaire VARCHAR(255),
-    statut_avis_id INT NOT NULL,
-    FOREIGN KEY (statut_avis_id)
-      REFERENCES statut_avis(statut_avis_id)
-);
 CREATE TABLE allergene
 (
 allergene_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -161,4 +152,17 @@ CREATE Table rel_plat_menu
     menu_id INT NOT NULL,
     Foreign Key (plat_id) REFERENCES plat(plat_id),
     Foreign Key (menu_id) REFERENCES menus(menu_id)
+);
+
+CREATE TABLE avis
+(
+    avis_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    note INT NOT NULL,
+    commentaire VARCHAR(255),
+    statut_avis_id INT NOT NULL,
+    numero_commande INT NOT NULL,
+    FOREIGN KEY (statut_avis_id)
+      REFERENCES statut_avis(statut_avis_id),
+    FOREIGN KEY (numero_commande) 
+      REFERENCES commande(numero_commande)
 );

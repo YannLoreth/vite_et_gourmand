@@ -1,3 +1,8 @@
+<?php
+require_once __DIR__ . '/../src/horaires.php';
+require_once __DIR__ . '/../src/avis.php';
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -37,7 +42,7 @@
 </nav>
 
 <h1 class="container text-center">Bienvenue chez Vite & Gourmand</h1>
-<section class="py-5">
+<section class="py-auto">
   <div class="container">
     <div class="row align-items-center mb-5">
       <div class="col-md-4">
@@ -69,49 +74,33 @@
   </div>
 </section>
 
-<h2 class="container">Quelques avis clients</h2>
-<div class="container">
-    <div class="row g-4">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">⭐⭐⭐⭐⭐ (5/5) — Camille R.</h5>
-                    <p class="card-text">
-                        "Menu de Noël réservé pour 12 personnes, tout était parfait !
-                        Les plats étaient copieux, bien présentés, et la livraison est arrivée pile à l'heure. On recommande à 100%."
-                    </p>
-                </div>
-            </div>
-        </div>
+<section class="py-auto">
+    <h2 class="container">Quelques avis clients</h2>
+    <div class="container">
+        <div class="row g-4">
 
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">⭐⭐⭐⭐ (4/5) — Thomas L.</h5>
-                    <p class="card-text">
-                        "Très bonne prestation pour l'anniversaire de ma fille. Quelques minutes de retard sur la livraison, mais l'équipe nous a prévenus à l'avance.
-                        Les plats étaient délicieux, on recommencera."
-                    </p>
-                </div>
-            </div>
-        </div>
+            <?php foreach ($avis_acc as $index => $card_avis): ?>
 
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">⭐⭐⭐⭐⭐ (5/5) — Sophie M.</h5>
-                    <p class="card-text">
-                        "Première commande chez Vite & Gourmand pour un menu classique entre amis, et clairement pas la dernière.
-                        Rapport qualité-prix excellent, et le service client a été très réactif à mes questions."
-                    </p>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><?= str_repeat('⭐', $card_avis['note']) ?> — <?= $card_avis['prenom'] ?> <?= substr($card_avis['nom'], 0, 1) ?>.</h5>
+                            <p class="card-text"><?= $card_avis['commentaire'] ?></p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+            <?php endforeach; ?>
+
         </div>
-    </div>
     </div>
 </section>
 
-<?php require_once __DIR__ . '/../src/horaires.php'; ?>
+
+
+    </div>
+    </div>
+</section>
 
 <footer class="text-center py-1 mt-2">
   <div class="container">
