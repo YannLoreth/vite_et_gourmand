@@ -97,14 +97,14 @@ Create Table roles
 create table utilisateur
 (
     utilisateur_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(100) NOT NULL,
-    pass VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    pass VARCHAR(255) NOT NULL,
     prenom VARCHAR(50) NOT NULL,
     nom VARCHAR(50) NOT NULL,
     telephone VARCHAR(50) NOT NULL,
     ville VARCHAR(50) NOT NULL,
     pays VARCHAR(50) NOT NULL,
-    addresse_postale VARCHAR(100),
+    addresse_postale VARCHAR(100) NOT NULL,
     roles_id INT NOT NULL,
     code_postal VARCHAR(5) NOT NULL,
     Foreign Key (roles_id) 
