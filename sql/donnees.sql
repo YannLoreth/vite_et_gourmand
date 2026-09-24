@@ -67,9 +67,9 @@ INSERT INTO statut_commande (libelle) VALUES
 
 -- utilisateur
 INSERT INTO utilisateur (email, pass, prenom, nom, telephone, ville, pays, addresse_postale, roles_id, code_postal) VALUES
-('camille.r@example.com', 'motdepasseHash1', 'Camille', 'R.', '0611111111', 'Bordeaux', 'France', '12 rue des Vignes', 1, '33000'),
-('thomas.l@example.com', 'motdepasseHash2', 'Thomas', 'L.', '0622222222', 'Bordeaux', 'France', '5 allée du Parc', 1, '33200'),
-('sophie.m@example.com', 'motdepasseHash3', 'Sophie', 'M.', '0633333333', 'Bordeaux', 'France', '8 place Gambetta', 1, '33000');
+('camille.r@example.com', 'motdepasseHash1', 'Camille', 'Robineau', '0611111111', 'Bordeaux', 'France', '12 rue des Vignes', 1, '33000'),
+('thomas.l@example.com', 'motdepasseHash2', 'Thomas', 'Lautrec', '0622222222', 'Bordeaux', 'France', '5 allée du Parc', 1, '33200'),
+('sophie.m@example.com', 'motdepasseHash3', 'Sophie', 'Martineau', '0633333333', 'Bordeaux', 'France', '8 place Gambetta', 1, '33000');
 
 -- commande
 INSERT INTO commande (date_commande, date_prestation, heure_livraison, prix_menu, nombre_personne, prix_livraison, pret_materiel, restitution_materiel, adresse_livraison_id, utilisateur_id, menu_id, statut_commande_id) VALUES
