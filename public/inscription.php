@@ -1,31 +1,72 @@
 <?php
-$erreur = null;
+$erreur_doublon = null;
+$erreur_champs = [];
+$email = trim($_POST['email'] ?? '');
+$pass = $_POST['pass'] ?? '';
+$prenom = trim($_POST['prenom'] ?? '');
+$nom = trim($_POST['nom'] ?? '');
+$telephone = trim($_POST['telephone'] ?? '');
+$ville = trim($_POST['ville'] ?? '');
+$pays = trim($_POST['pays'] ?? '');
+$addresse_postale = trim($_POST['addresse_postale'] ?? '');
+$code_postal = trim($_POST['code_postal'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   require_once __DIR__ . "/../src/config/database.php";
+  require_once __DIR__ ."/../src/validation.php";
 
-  $stmt_verif = $pdo->prepare("SELECT COUNT(*) FROM utilisateur WHERE email = :email");
-  $stmt_verif->execute(['email' => $_POST['email']]);
-  $nb_comptes = $stmt_verif->fetchColumn();
+  $champs_obligatoires = [
+    'nom' => $nom,
+    'prenom' => $prenom,
+    'telephone' => $telephone,
+    'addresse_postale' => $addresse_postale,
+    'code_postal' => $code_postal,
+    'ville' => $ville,
+    'pays' => $pays,
+    'email' => $email,
+    'pass' => $pass,
+  ];
 
-  if ($nb_comptes == 0) {
-    $pass_hash = password_hash($_POST['pass'], PASSWORD_DEFAULT);
+  foreach ($champs_obligatoires as $champ => $valeur) {
+    if ($valeur === '') {
+      $erreur_champs[$champ] = 'Ce champ est obligatoire.';
+    }
+  }
 
-    $stmt_inscript = $pdo->prepare("INSERT INTO utilisateur (email, pass, prenom, nom, telephone, ville, pays, addresse_postale, code_postal, roles_id)
+  if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+    $erreur_champs['email'] = "L'adresse email n'est pas valide.";
+  }
+
+$erreur_pass = verifier_mot_de_passe($pass);
+if ($pass !== '' && $erreur_pass !== null) {
+    $erreur_champs['pass'] = $erreur_pass;
+}
+
+  if (empty($erreur_champs)) {
+
+    $stmt_verif = $pdo->prepare("SELECT COUNT(*) FROM utilisateur WHERE email = :email");
+    $stmt_verif->execute(['email' => $email]);
+    $nb_comptes = $stmt_verif->fetchColumn();
+
+    if ($nb_comptes == 0) {
+      $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
+
+      $stmt_inscript = $pdo->prepare("INSERT INTO utilisateur (email, pass, prenom, nom, telephone, ville, pays, addresse_postale, code_postal, roles_id)
             VALUES (:email, :pass, :prenom, :nom, :telephone, :ville, :pays, :addresse_postale, :code_postal, 1)");
-    $stmt_inscript->execute([
-      'email' => $_POST['email'],
-      'pass' => $pass_hash,
-      'prenom' => $_POST['prenom'],
-      'nom' => $_POST['nom'],
-      'telephone' => $_POST['telephone'],
-      'ville' => $_POST['ville'],
-      'pays' => $_POST['pays'],
-      'addresse_postale' => $_POST['addresse_postale'],
-      'code_postal' => $_POST['code_postal'],
-    ]);
-  } else {
-    $erreur = 'Un compte existe déjà avec cette adresse email. <a href="mot-de-passe-oublie.php">Mot de passe oublié ?</a>';
+      $stmt_inscript->execute([
+        'email' => $email,
+        'pass' => $pass_hash,
+        'prenom' => $prenom,
+        'nom' => $nom,
+        'telephone' => $telephone,
+        'ville' => $ville,
+        'pays' => $pays,
+        'addresse_postale' => $addresse_postale,
+        'code_postal' => $code_postal,
+      ]);
+    } else {
+      $erreur_doublon = 'Un compte existe déjà avec cette adresse email. <a href="mot-de-passe-oublie.php">Mot de passe oublié ?</a>';
+    }
   }
 }
 
@@ -37,8 +78,8 @@ require_once __DIR__ . '/../src/partials/header.php';
 
   <form class="needs-validation" method="post">
 
-    <?php if ($erreur !== null): ?>
-      <div class="alert alert-danger" role="alert"><?= $erreur ?></div>
+    <?php if ($erreur_doublon !== null): ?>
+      <div class="alert alert-danger" role="alert"><?= $erreur_doublon ?></div>
     <?php endif; ?>
 
     <fieldset class="border rounded p-3 mt-4 mb-4">
