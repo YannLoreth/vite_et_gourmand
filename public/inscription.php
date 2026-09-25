@@ -1,77 +1,111 @@
 <?php
+$erreur = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  require_once __DIR__ . "/../src/config/database.php";
+
+  $stmt_verif = $pdo->prepare("SELECT COUNT(*) FROM utilisateur WHERE email = :email");
+  $stmt_verif->execute(['email' => $_POST['email']]);
+  $nb_comptes = $stmt_verif->fetchColumn();
+
+  if ($nb_comptes == 0) {
+    $pass_hash = password_hash($_POST['pass'], PASSWORD_DEFAULT);
+
+    $stmt_inscript = $pdo->prepare("INSERT INTO utilisateur (email, pass, prenom, nom, telephone, ville, pays, addresse_postale, code_postal, roles_id)
+            VALUES (:email, :pass, :prenom, :nom, :telephone, :ville, :pays, :addresse_postale, :code_postal, 1)");
+    $stmt_inscript->execute([
+      'email' => $_POST['email'],
+      'pass' => $pass_hash,
+      'prenom' => $_POST['prenom'],
+      'nom' => $_POST['nom'],
+      'telephone' => $_POST['telephone'],
+      'ville' => $_POST['ville'],
+      'pays' => $_POST['pays'],
+      'addresse_postale' => $_POST['addresse_postale'],
+      'code_postal' => $_POST['code_postal'],
+    ]);
+  } else {
+    $erreur = 'Un compte existe déjà avec cette adresse email. <a href="mot-de-passe-oublie.php">Mot de passe oublié ?</a>';
+  }
+}
+
 $titre_page = "Créer un compte";
 require_once __DIR__ . '/../src/partials/header.php';
 ?>
 
 <section class="container py-auto mb-auto mt-auto">
 
-    <form class="needs-validation" method="post">
+  <form class="needs-validation" method="post">
+
+    <?php if ($erreur !== null): ?>
+      <div class="alert alert-danger" role="alert"><?= $erreur ?></div>
+    <?php endif; ?>
 
     <fieldset class="border rounded p-3 mt-4 mb-4">
       <legend class="fs-5">Vos coordonnées</legend>
 
-     <div class="row g-3">
+      <div class="row g-3">
 
-      <div class="col-md-4">
-       <label for="validationNom" class="form-label">Nom</label>
-       <input type="text" class="form-control" id="validationNom" name="nom" required>
-         <div class="valid-feedback">
-        Bien !
-         </div>
-      </div>
-
-      <div class="col-md-4">
-       <label for="validationPrenom" class="form-label">Prénom</label>
-        <input type="text" class="form-control" id="validationPrenom" name="prenom" required>
-         <div class="valid-feedback">
-              Bien ! 
-         </div>
-      </div>
-
-      <div class="col-md-4">
-       <label for="validationTel" class="form-label">Téléphone</label>
-        <input type="tel" class="form-control" id="validationTel" name="telephone" required>
-        <div class="invalid-feedback">
-             SVP saisir un téléphone valide.
-        </div>
-      </div>
-
-      <div class="col-md-12">
-       <label for="validationAddresse"  class="form-label">Adresse</label>
-        <input type="text" class="form-control" id="validationAddresse" name="addresse_postale" required>
-         <div class="invalid-feedback">
-          SVP saisir une adresse postale
-         </div>
-      </div>
-
-      <div class="col-md-3">
-        <label for="validationCP" class="form-label">Code Postal</label>
-         <input type="text" class="form-control" id="validationCP" name="code_postal" required>
-         <div class="invalid-feedback">
-          SVP saisir un code postal.
-         </div>
-      </div>
-
-      <div class="col-md-6">
-       <label for="validationVille" class="form-label">Ville</label>
-         <input type="text" class="form-control" id="validationVille" name="ville" required>
-         <div class="invalid-feedback">
-           SVP saisir la ville
+        <div class="col-md-4">
+          <label for="validationNom" class="form-label">Nom</label>
+          <input type="text" class="form-control" id="validationNom" name="nom" required>
+          <div class="valid-feedback">
+            Bien !
           </div>
-      </div>
+        </div>
 
-      <div class="col-md-3">
-        <label for="validationPays" class="form-label">Pays</label>
-         <input type="text" class="form-control" id="validationPays" value="France" name="pays" required>
+        <div class="col-md-4">
+          <label for="validationPrenom" class="form-label">Prénom</label>
+          <input type="text" class="form-control" id="validationPrenom" name="prenom" required>
+          <div class="valid-feedback">
+            Bien !
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label for="validationTel" class="form-label">Téléphone</label>
+          <input type="tel" class="form-control" id="validationTel" name="telephone" required>
+          <div class="invalid-feedback">
+            SVP saisir un téléphone valide.
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <label for="validationAddresse" class="form-label">Adresse</label>
+          <input type="text" class="form-control" id="validationAddresse" name="addresse_postale" required>
+          <div class="invalid-feedback">
+            SVP saisir une adresse postale
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="validationCP" class="form-label">Code Postal</label>
+          <input type="text" class="form-control" id="validationCP" name="code_postal" required>
+          <div class="invalid-feedback">
+            SVP saisir un code postal.
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="validationVille" class="form-label">Ville</label>
+          <input type="text" class="form-control" id="validationVille" name="ville" required>
+          <div class="invalid-feedback">
+            SVP saisir la ville
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="validationPays" class="form-label">Pays</label>
+          <input type="text" class="form-control" id="validationPays" value="France" name="pays" required>
           <div class="invalid-feedback">
             SVP saisir le pays
           </div>
-      </div>
+        </div>
 
-     </div>
+      </div>
     </fieldset>
 
-        <fieldset class="border rounded p-3 mt-4 mb-4">
+    <fieldset class="border rounded p-3 mt-4 mb-4">
       <legend class="fs-5">Vos identifiants</legend>
 
       <div class="row g-3">
@@ -93,20 +127,20 @@ require_once __DIR__ . '/../src/partials/header.php';
             <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-lock" aria-hidden="true"></i></span>
             <input type="password" class="form-control" id="validationPass" name="pass" aria-describedby="aideMdp" required>
             <div id="aideMdp" class="form-text">
-            10 caractères minimum, dont une majuscule, une minuscule, un chiffre et un caractère spécial.
-           </div>
-        </div>
+              10 caractères minimum, dont une majuscule, une minuscule, un chiffre et un caractère spécial.
+            </div>
+          </div>
         </div>
 
       </div>
 
     </fieldset>
 
-  <div class="col-12 d-flex justify-content-end gap-2 mb-5">
-    <button class="btn btn-secondary" type="reset">Annuler</button>
-    <button class="btn btn-primary" type="submit">Valider</button>
-  </div>
-   </form>
-  </section>
+    <div class="col-12 d-flex justify-content-end gap-2 mb-5">
+      <button class="btn btn-secondary" type="reset">Annuler</button>
+      <button class="btn btn-primary" type="submit">Valider</button>
+    </div>
+  </form>
+</section>
 
 <?php require_once __DIR__ . '/../src/partials/footer.php'; ?>
