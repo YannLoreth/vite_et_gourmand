@@ -1,4 +1,6 @@
 <?php
+
+// Contrôle du mot de passe
 function verifier_mot_de_passe(string $pass): ?string
 {
     if (mb_strlen($pass) < 10) {
@@ -19,4 +21,16 @@ function verifier_mot_de_passe(string $pass): ?string
     return null;
 }
 
-?>
+// Contôles des champs de formulaire
+function classe_erreur(array $erreurs, string $champ): string
+{
+    return isset($erreurs[$champ]) ? 'is-invalid' : '';
+}
+
+function message_erreur(array $erreurs, string $champ): string
+{
+    if (!isset($erreurs[$champ])) {
+        return '';
+    }
+    return '<div id="erreur-' . $champ . '" class="invalid-feedback">' . htmlspecialchars($erreurs[$champ]) . '</div>';
+}
