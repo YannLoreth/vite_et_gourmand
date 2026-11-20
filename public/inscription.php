@@ -12,7 +12,15 @@ foreach (['nom', 'prenom', 'ville', 'telephone', 'addresse_postale', 'code_posta
 }
 $donnees['pays'] = trim($_POST['pays'] ?? 'France');
 $donnees['pass'] = $_POST['pass'] ?? '';
-
+$champs_formulaire = [
+  'nom' => ['libelle' => 'Nom', 'type' => 'text', 'largeur' => 4],
+  'prenom' => ['libelle' => 'Prénom', 'type' => 'text', 'largeur' => 4],
+  'telephone' => ['libelle' => 'Téléphone', 'type' => 'tel', 'largeur' => 4],
+  'addresse_postale' => ['libelle' => 'Adresse', 'type' => 'text', 'largeur' => 12],
+  'code_postal' => ['libelle' => 'Code Postal', 'type' => 'text', 'inputmode' => 'numeric', 'largeur' => 3],
+  'ville' => ['libelle' => 'Ville', 'type' => 'text', 'largeur' => 6],
+  'pays' => ['libelle' => 'Pays', 'type' => 'text', 'largeur' => 3]
+];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   require_once __DIR__ . "/../src/config/database.php";
@@ -65,90 +73,10 @@ require_once __DIR__ . '/../src/partials/header.php';
 
       <div class="row g-3">
 
-        <div class="col-md-4">
-          <label for="validationNom" class="form-label">Nom</label>
-          <input type="text"
-            class="form-control <?= classe_erreur($erreur_inscription, 'nom') ?>"
-            id="validationNom"
-            name="nom"
-            value="<?= htmlspecialchars($donnees['nom']) ?>"
-            aria-describedby="erreur-nom"
-            required>
-          <?= message_erreur($erreur_inscription, 'nom') ?>
-        </div>
-
-        <div class="col-md-4">
-          <label for="validationPrenom" class="form-label">Prénom</label>
-          <input
-            type="text"
-            class="form-control <?= classe_erreur($erreur_inscription, 'prenom') ?>"
-            id="validationPrenom"
-            name="prenom"
-            value="<?= htmlspecialchars($donnees['prenom']) ?>"
-            aria-describedby="erreur-prenom"
-            required>
-          <?= message_erreur($erreur_inscription, 'prenom') ?>
-        </div>
-
-        <div class="col-md-4">
-          <label for="validationTel" class="form-label">Téléphone</label>
-          <input type="tel"
-            class="form-control <?= classe_erreur($erreur_inscription, 'telephone') ?>"
-            id="validationTel"
-            name="telephone"
-            value="<?= htmlspecialchars($donnees['telephone']) ?>"
-            aria-describedby="erreur-telephone"
-            required>
-          <?= message_erreur($erreur_inscription, 'telephone') ?>
-        </div>
-
-        <div class="col-md-12">
-          <label for="validationAddresse" class="form-label">Adresse</label>
-          <input type="text"
-            class="form-control <?= classe_erreur($erreur_inscription, 'addresse_postale') ?>"
-            id="validationAddresse"
-            name="addresse_postale"
-            value="<?= htmlspecialchars($donnees['addresse_postale']) ?>"
-            aria-describedby="erreur-addresse_postale"
-            required>
-          <?= message_erreur($erreur_inscription, 'addresse_postale') ?>
-        </div>
-
-        <div class="col-md-3">
-          <label for="validationCP" class="form-label">Code Postal</label>
-          <input type="text"
-            class="form-control <?= classe_erreur($erreur_inscription, 'code_postal') ?>"
-            id="validationCP"
-            name="code_postal"
-            value="<?= htmlspecialchars($donnees['code_postal']) ?>"
-            inputmode="numeric"
-            aria-describedby="erreur-code_postal"
-            required>
-          <?= message_erreur($erreur_inscription, 'code_postal') ?>
-        </div>
-
-        <div class="col-md-6">
-          <label for="validationVille" class="form-label">Ville</label>
-          <input type="text"
-            class="form-control <?= classe_erreur($erreur_inscription, 'ville') ?>"
-            id="validationVille"
-            name="ville"
-            value="<?= htmlspecialchars($donnees['ville']) ?>"
-            aria-describedby="erreur-ville"
-            required>
-          <?= message_erreur($erreur_inscription, 'ville') ?>
-        </div>
-
-        <div class="col-md-3">
-          <label for="validationPays" class="form-label">Pays</label>
-          <input type="text"
-            class="form-control <?= classe_erreur($erreur_inscription, 'pays') ?>"
-            id="validationPays"
-            name="pays" value="<?= htmlspecialchars($donnees['pays']) ?>"
-            aria-describedby="erreur-pays"
-            required>
-          <?= message_erreur($erreur_inscription, 'pays') ?>
-        </div>
+        <?php foreach ($champs_formulaire as $nom_champ => $description_champ) {
+          require __DIR__ . '/../src/partials/champs_formulaires.php';
+        }
+        ?>
 
       </div>
     </fieldset>
