@@ -1,77 +1,43 @@
 <?php
 require_once __DIR__ . "/../src/validation.php";
+require_once __DIR__ . "/../src/utilisateur.php";
 $erreur_doublon = null;
+$succes = false;
 $erreur_champs = [];
-$email = trim($_POST['email'] ?? '');
-$pass = $_POST['pass'] ?? '';
-$prenom = trim($_POST['prenom'] ?? '');
-$nom = trim($_POST['nom'] ?? '');
-$telephone = trim($_POST['telephone'] ?? '');
-$ville = trim($_POST['ville'] ?? '');
-$pays = trim($_POST['pays'] ?? 'France');
-$addresse_postale = trim($_POST['addresse_postale'] ?? '');
-$code_postal = trim($_POST['code_postal'] ?? '');
+$erreur_champs_vide = [];
+$erreur_inscription = [];
+$donnees = [];
+foreach (['nom', 'prenom', 'ville', 'telephone', 'addresse_postale', 'code_postal', 'email'] as $champ) {
+  $donnees[$champ] = trim($_POST[$champ] ?? '');
+}
+$donnees['pays'] = trim($_POST['pays'] ?? 'France');
+$donnees['pass'] = $_POST['pass'] ?? '';
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   require_once __DIR__ . "/../src/config/database.php";
 
-
-  $champs_obligatoires = [
-    'nom' => $nom,
-    'prenom' => $prenom,
-    'telephone' => $telephone,
-    'addresse_postale' => $addresse_postale,
-    'code_postal' => $code_postal,
-    'ville' => $ville,
-    'pays' => $pays,
-    'email' => $email,
-    'pass' => $pass,
-  ];
-
-  foreach ($champs_obligatoires as $champ => $valeur_champ) {
+  foreach ($donnees as $champ => $valeur_champ) {
     if ($valeur_champ === '') {
-      $erreur_champs[$champ] = 'Ce champ est obligatoire.';
+      $erreur_champs_vide[$champ] = 'Ce champ est obligatoire.';
     }
   }
 
-  if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
-    $erreur_champs['email'] = "L'adresse email n'est pas valide.";
-  }
+  $erreur_champs = valider_inscription($donnees);
 
-  if ($code_postal !== '' && preg_match('/^[0-9]{5}$/', $code_postal) === 0) {
-    $erreur_champs['code_postal'] = 'Le code postal doit contenir 5 chiffres.';
-  }
+  $erreur_inscription = array_merge($erreur_champs, $erreur_champs_vide);
 
-  if ($telephone !== '' && preg_match('/^0[1-9][0-9]{8}$/', str_replace(' ', '', $telephone)) === 0) {
-    $erreur_champs['telephone'] = 'Le numéro de téléphone doit contenir 10 chiffres et commencer par 0.';
-  }
-  $erreur_pass = verifier_mot_de_passe($pass);
-  if ($pass !== '' && $erreur_pass !== null) {
-    $erreur_champs['pass'] = $erreur_pass;
-  }
+  if (empty($erreur_inscription)) {
 
-  if (empty($erreur_champs)) {
+    $compte_absent = compte_absent($pdo, $donnees['email']);
 
-    $stmt_verif = $pdo->prepare("SELECT COUNT(*) FROM utilisateur WHERE email = :email");
-    $stmt_verif->execute(['email' => $email]);
-    $nb_comptes = $stmt_verif->fetchColumn();
-
-    if ($nb_comptes == 0) {
-      $pass_hash = password_hash($pass, PASSWORD_DEFAULT);
-
-      $stmt_inscript = $pdo->prepare("INSERT INTO utilisateur (email, pass, prenom, nom, telephone, ville, pays, addresse_postale, code_postal, roles_id)
-            VALUES (:email, :pass, :prenom, :nom, :telephone, :ville, :pays, :addresse_postale, :code_postal, 1)");
-      $stmt_inscript->execute([
-        'email' => $email,
-        'pass' => $pass_hash,
-        'prenom' => $prenom,
-        'nom' => $nom,
-        'telephone' => $telephone,
-        'ville' => $ville,
-        'pays' => $pays,
-        'addresse_postale' => $addresse_postale,
-        'code_postal' => $code_postal,
-      ]);
+    if ($compte_absent) {
+      $inscription = creer_utilisateur($pdo, $donnees);
+      $succes = $inscription;
+      if ($inscription == TRUE) {
+        $donnees['email'] = $donnees['pass'] = $donnees['prenom'] = $donnees['nom'] = $donnees['telephone'] = $donnees['ville'] = $donnees['addresse_postale'] = $donnees['code_postal'] = '';
+        $donnees['pays'] = 'France';
+      }
     } else {
       $erreur_doublon = 'Un compte existe déjà avec cette adresse email. <a href="mot-de-passe-oublie.php">Mot de passe oublié ?</a>';
     }
@@ -86,6 +52,10 @@ require_once __DIR__ . '/../src/partials/header.php';
 
   <form class="needs-validation" method="post" novalidate>
 
+    <?php if ($succes): ?>
+      <div class="alert alert-success" role="alert">Votre compte a bien été créé.</div>
+    <?php endif; ?>
+
     <?php if ($erreur_doublon !== null): ?>
       <div class="alert alert-danger" role="alert"><?= $erreur_doublon ?></div>
     <?php endif; ?>
@@ -98,86 +68,86 @@ require_once __DIR__ . '/../src/partials/header.php';
         <div class="col-md-4">
           <label for="validationNom" class="form-label">Nom</label>
           <input type="text"
-            class="form-control <?= classe_erreur($erreur_champs, 'nom') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'nom') ?>"
             id="validationNom"
             name="nom"
-            value="<?= htmlspecialchars($nom) ?>"
+            value="<?= htmlspecialchars($donnees['nom']) ?>"
             aria-describedby="erreur-nom"
             required>
-          <?= message_erreur($erreur_champs, 'nom') ?>
+          <?= message_erreur($erreur_inscription, 'nom') ?>
         </div>
 
         <div class="col-md-4">
           <label for="validationPrenom" class="form-label">Prénom</label>
           <input
             type="text"
-            class="form-control <?= classe_erreur($erreur_champs, 'prenom') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'prenom') ?>"
             id="validationPrenom"
             name="prenom"
-            value="<?= htmlspecialchars($prenom) ?>"
+            value="<?= htmlspecialchars($donnees['prenom']) ?>"
             aria-describedby="erreur-prenom"
             required>
-          <?= message_erreur($erreur_champs, 'prenom') ?>
+          <?= message_erreur($erreur_inscription, 'prenom') ?>
         </div>
 
         <div class="col-md-4">
           <label for="validationTel" class="form-label">Téléphone</label>
           <input type="tel"
-            class="form-control <?= classe_erreur($erreur_champs, 'telephone') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'telephone') ?>"
             id="validationTel"
             name="telephone"
-            value="<?= htmlspecialchars($telephone) ?>"
+            value="<?= htmlspecialchars($donnees['telephone']) ?>"
             aria-describedby="erreur-telephone"
             required>
-          <?= message_erreur($erreur_champs, 'telephone') ?>
+          <?= message_erreur($erreur_inscription, 'telephone') ?>
         </div>
 
         <div class="col-md-12">
           <label for="validationAddresse" class="form-label">Adresse</label>
           <input type="text"
-            class="form-control <?= classe_erreur($erreur_champs, 'addresse_postale') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'addresse_postale') ?>"
             id="validationAddresse"
             name="addresse_postale"
-            value="<?= htmlspecialchars($addresse_postale) ?>"
+            value="<?= htmlspecialchars($donnees['addresse_postale']) ?>"
             aria-describedby="erreur-addresse_postale"
             required>
-          <?= message_erreur($erreur_champs, 'addresse_postale') ?>
+          <?= message_erreur($erreur_inscription, 'addresse_postale') ?>
         </div>
 
         <div class="col-md-3">
           <label for="validationCP" class="form-label">Code Postal</label>
           <input type="text"
-            class="form-control <?= classe_erreur($erreur_champs, 'code_postal') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'code_postal') ?>"
             id="validationCP"
             name="code_postal"
-            value="<?= htmlspecialchars($code_postal) ?>"
+            value="<?= htmlspecialchars($donnees['code_postal']) ?>"
             inputmode="numeric"
             aria-describedby="erreur-code_postal"
             required>
-          <?= message_erreur($erreur_champs, 'code_postal') ?>
+          <?= message_erreur($erreur_inscription, 'code_postal') ?>
         </div>
 
         <div class="col-md-6">
           <label for="validationVille" class="form-label">Ville</label>
           <input type="text"
-            class="form-control <?= classe_erreur($erreur_champs, 'ville') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'ville') ?>"
             id="validationVille"
             name="ville"
-            value="<?= htmlspecialchars($ville) ?>"
+            value="<?= htmlspecialchars($donnees['ville']) ?>"
             aria-describedby="erreur-ville"
             required>
-          <?= message_erreur($erreur_champs, 'ville') ?>
+          <?= message_erreur($erreur_inscription, 'ville') ?>
         </div>
 
         <div class="col-md-3">
           <label for="validationPays" class="form-label">Pays</label>
           <input type="text"
-            class="form-control <?= classe_erreur($erreur_champs, 'pays') ?>"
+            class="form-control <?= classe_erreur($erreur_inscription, 'pays') ?>"
             id="validationPays"
-            name="pays" value="<?= htmlspecialchars($pays) ?>"
+            name="pays" value="<?= htmlspecialchars($donnees['pays']) ?>"
             aria-describedby="erreur-pays"
             required>
-          <?= message_erreur($erreur_champs, 'pays') ?>
+          <?= message_erreur($erreur_inscription, 'pays') ?>
         </div>
 
       </div>
@@ -193,12 +163,12 @@ require_once __DIR__ . '/../src/partials/header.php';
           <div class="input-group has-validation">
             <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-envelope" aria-hidden="true"></i></span>
             <input type="email"
-              class="form-control <?= classe_erreur($erreur_champs, 'email') ?>"
+              class="form-control <?= classe_erreur($erreur_inscription, 'email') ?>"
               id="validationEmail"
-              name="email" value="<?= htmlspecialchars($email) ?>"
+              name="email" value="<?= htmlspecialchars($donnees['email']) ?>"
               aria-describedby="erreur-email"
               required>
-            <?= message_erreur($erreur_champs, 'email') ?>
+            <?= message_erreur($erreur_inscription, 'email') ?>
           </div>
         </div>
 
@@ -206,10 +176,11 @@ require_once __DIR__ . '/../src/partials/header.php';
           <label for="validationPass" class="form-label">Mot de passe</label>
           <div class="input-group has-validation">
             <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-lock" aria-hidden="true"></i></span>
-            <input type="password" class="form-control" id="validationPass" name="pass" aria-describedby="aideMdp" required>
-            <div id="aideMdp" class="form-text">
-              10 caractères minimum, dont une majuscule, une minuscule, un chiffre et un caractère spécial.
-            </div>
+            <input type="password" class="form-control <?= classe_erreur($erreur_inscription, 'pass') ?>" id="validationPass" name="pass" aria-describedby="aideMdp erreur-pass" required>
+            <?= message_erreur($erreur_inscription, 'pass') ?>
+          </div>
+          <div id="aideMdp" class="form-text">
+            10 caractères minimum, dont une majuscule, une minuscule, un chiffre et un caractère spécial.
           </div>
         </div>
 
