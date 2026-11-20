@@ -5,7 +5,7 @@
   --couleur-texte-sombre: #2D3436;
   --couleur-vert-clair: #B8CFA9;   /* fonds, bordures, décoratif */
   --couleur-vert-fonce: #5C7A5C;   /* texte, liens, icônes */
-  --couleur-accent: #C97C5D;       /* boutons d'action */
+  --couleur-accent: #A65E42;       /* boutons d'action */
 }
 
 body {
@@ -52,10 +52,7 @@ nav .navbar-brand:hover{
   border: none;
   border-top: 3px solid var(--couleur-accent);
 }
-.card {
-  border: none;
-  border-top: 3px solid var(--couleur-accent);
-}
+
 h1, h2 {
   letter-spacing: -0.02em;
 }
@@ -68,4 +65,22 @@ p {
 footer p {
     margin-bottom: 0;
     line-height: 1.2;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--couleur-accent);
+  --bs-btn-border-color: var(--couleur-accent);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--couleur-accent) 85%, black);
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--couleur-accent) 85%, black);
+  --bs-btn-active-bg: color-mix(in srgb, var(--couleur-accent) 70%, black);
+  --bs-btn-active-border-color: color-mix(in srgb, var(--couleur-accent) 70%, black);
+}
+
+button {
+  min-width: 8rem;
+}
+
+.form-control:focus {
+  border-color: var(--couleur-vert-fonce);
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--couleur-vert-fonce) 50%, transparent);
 }
