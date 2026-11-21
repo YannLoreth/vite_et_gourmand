@@ -12,15 +12,7 @@ foreach (['nom', 'prenom', 'ville', 'telephone', 'addresse_postale', 'code_posta
 }
 $donnees['pays'] = trim($_POST['pays'] ?? 'France');
 $donnees['pass'] = $_POST['pass'] ?? '';
-$champs_formulaire = [
-  'nom' => ['libelle' => 'Nom', 'type' => 'text', 'largeur' => 4],
-  'prenom' => ['libelle' => 'Prénom', 'type' => 'text', 'largeur' => 4],
-  'telephone' => ['libelle' => 'Téléphone', 'type' => 'tel', 'largeur' => 4],
-  'addresse_postale' => ['libelle' => 'Adresse', 'type' => 'text', 'largeur' => 12],
-  'code_postal' => ['libelle' => 'Code Postal', 'type' => 'text', 'inputmode' => 'numeric', 'largeur' => 3],
-  'ville' => ['libelle' => 'Ville', 'type' => 'text', 'largeur' => 6],
-  'pays' => ['libelle' => 'Pays', 'type' => 'text', 'largeur' => 3]
-];
+$champs_formulaire = require __DIR__ . '/../src/config/champs.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   require_once __DIR__ . "/../src/config/database.php";
@@ -74,6 +66,9 @@ require_once __DIR__ . '/../src/partials/header.php';
       <div class="row g-3">
 
         <?php foreach ($champs_formulaire as $nom_champ => $description_champ) {
+          if ($description_champ['groupe'] !== 'coordonnees') {
+            continue;
+          }
           require __DIR__ . '/../src/partials/champs_formulaires.php';
         }
         ?>
@@ -86,31 +81,13 @@ require_once __DIR__ . '/../src/partials/header.php';
 
       <div class="row g-3">
 
-        <div class="col-md-6">
-          <label for="validationEmail" class="form-label">Email</label>
-          <div class="input-group has-validation">
-            <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-envelope" aria-hidden="true"></i></span>
-            <input type="email"
-              class="form-control <?= classe_erreur($erreur_inscription, 'email') ?>"
-              id="validationEmail"
-              name="email" value="<?= htmlspecialchars($donnees['email']) ?>"
-              aria-describedby="erreur-email"
-              required>
-            <?= message_erreur($erreur_inscription, 'email') ?>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <label for="validationPass" class="form-label">Mot de passe</label>
-          <div class="input-group has-validation">
-            <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-lock" aria-hidden="true"></i></span>
-            <input type="password" class="form-control <?= classe_erreur($erreur_inscription, 'pass') ?>" id="validationPass" name="pass" aria-describedby="aideMdp erreur-pass" required>
-            <?= message_erreur($erreur_inscription, 'pass') ?>
-          </div>
-          <div id="aideMdp" class="form-text">
-            10 caractères minimum, dont une majuscule, une minuscule, un chiffre et un caractère spécial.
-          </div>
-        </div>
+        <?php foreach ($champs_formulaire as $nom_champ => $description_champ) {
+          if ($description_champ['groupe'] !== 'identifiants') {
+            continue;
+          }
+          require __DIR__ . '/../src/partials/champs_formulaires.php';
+        }
+        ?>
 
       </div>
 
