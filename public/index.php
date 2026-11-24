@@ -1,4 +1,5 @@
 <?php
+session_start();
 $titre_page = "Accueil";
 require_once __DIR__ . '/../src/partials/header.php';
 require_once __DIR__ . '/../src/avis.php';
