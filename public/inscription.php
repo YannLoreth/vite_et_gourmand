@@ -5,7 +5,7 @@ $erreur_doublon = null;
 $succes = false;
 $erreur_champs = [];
 $erreur_champs_vide = [];
-$erreur_inscription = [];
+$erreur= [];
 $donnees = [];
 foreach (['nom', 'prenom', 'ville', 'telephone', 'addresse_postale', 'code_postal', 'email'] as $champ) {
   $donnees[$champ] = trim($_POST[$champ] ?? '');
@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $erreur_champs = valider_inscription($donnees);
 
-  $erreur_inscription = array_merge($erreur_champs, $erreur_champs_vide);
+  $erreur= array_merge($erreur_champs, $erreur_champs_vide);
 
-  if (empty($erreur_inscription)) {
+  if (empty($erreur)) {
 
     $compte_absent = compte_absent($pdo, $donnees['email']);
 

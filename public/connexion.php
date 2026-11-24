@@ -1,51 +1,57 @@
 <?php
 require_once __DIR__ . "/../src/validation.php";
 require_once __DIR__ . "/../src/utilisateur.php";
+$erreur = [];
+$donnees = [];
+$donnees['email'] = trim($_POST['email'] ?? '');
+$donnees['pass'] = $_POST['pass'] ?? '';
+$champs_formulaire = require __DIR__ . '/../src/config/champs.php';
 
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . "/../src/config/database.php";
+
+    foreach ($donnees as $champ => $valeur_champ) {
+        if ($valeur_champ === '') {
+            $erreur[$champ] = 'Ce champ est obligatoire.';
+        }
+    }
+    if (empty($erreur)) {
+        $utilisateur_existe =  trouver_utilisateur($pdo, $donnees['email']);
+        if (!$utilisateur_existe || !password_verify($donnees['pass'], $utilisateur_existe['pass'])) {
+            $erreur['pass'] = 'Identifiants incorrects';
+        }
+    }
+}
 
 $titre_page = "Connexion";
 require_once __DIR__ . '/../src/partials/header.php';
 ?>
 
 <section class="container py-auto mb-auto mt-auto">
-    <fieldset class="border rounded p-3 mt-4 mb-4">
-        <legend class="fs-5">Vos identifiants</legend>
+    <form method="post">
 
-        <div class="row g-3">
+        <fieldset class="border rounded p-3 mt-4 mb-4">
+            <legend class="fs-5">Vos identifiants</legend>
 
-            <div class="col-md-6">
-                <label for="validationEmail" class="form-label">Email</label>
-                <div class="input-group has-validation">
-                    <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-envelope" aria-hidden="true"></i></span>
-                    <input type="email"
-                        class="form-control <?= classe_erreur($erreur_inscription, 'email') ?>"
-                        id="validationEmail"
-                        name="email" value="<?= htmlspecialchars($donnees['email']) ?>"
-                        aria-describedby="erreur-email"
-                        required>
-                    <?= message_erreur($erreur_inscription, 'email') ?>
-                </div>
+            <div class="row g-3">
+
+                <?php foreach ($champs_formulaire as $nom_champ => $description_champ) {
+                    if ($description_champ['groupe'] !== 'identifiants') {
+                        continue;
+                    }
+                    unset($description_champ['aide']);
+                    require __DIR__ . '/../src/partials/champs_formulaires.php';
+                }
+                ?>
+
             </div>
 
-            <div class="col-md-6">
-                <label for="validationPass" class="form-label">Mot de passe</label>
-                <div class="input-group has-validation">
-                    <span class="input-group-text" id="inputGroupPrepend"><i class="bi bi-lock" aria-hidden="true"></i></span>
-                    <input type="password" class="form-control <?= classe_erreur($erreur_inscription, 'pass') ?>" id="validationPass" name="pass" aria-describedby="aideMdp erreur-pass" required>
-                    <?= message_erreur($erreur_inscription, 'pass') ?>
-                </div>
-                <div id="aideMdp" class="form-text">
-                    10 caractères minimum, dont une majuscule, une minuscule, un chiffre et un caractère spécial.
-                </div>
-            </div>
+        </fieldset>
 
+        <div class="col-12 d-flex justify-content-end gap-2 mb-5">
+            <button class="btn btn-secondary" type="reset">Annuler</button>
+            <button class="btn btn-primary" type="submit">Valider</button>
         </div>
-
-    </fieldset>
-
-    <div class="col-12 d-flex justify-content-end gap-2 mb-5">
-        <button class="btn btn-secondary" type="reset">Annuler</button>
-        <button class="btn btn-primary" type="submit">Valider</button>
-    </div>
     </form>
 </section>

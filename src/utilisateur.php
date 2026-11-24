@@ -29,3 +29,11 @@ function creer_utilisateur(PDO $pdo, array $donnees): bool
         'code_postal' => $donnees['code_postal'],
     ]);
 }
+
+// Retrouver un utilisateur
+function trouver_utilisateur(PDO $pdo, string $email): array|false
+{
+    $stmt_verif = $pdo->prepare("SELECT utilisateur_id, prenom, pass, roles_id FROM utilisateur WHERE email = :email");
+    $stmt_verif->execute(['email' => $email]);
+    return $stmt_verif->fetch(PDO::FETCH_ASSOC);
+}
