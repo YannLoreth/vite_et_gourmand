@@ -61,4 +61,7 @@ require_once __DIR__ . '/../src/partials/header.php';
             <button class="btn btn-primary" type="submit">Valider</button>
         </div>
     </form>
+
+    <p>Pas de compte ? <a href="inscription.php">En créer un ici.</a></p>
+
 </section>

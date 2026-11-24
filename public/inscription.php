@@ -99,6 +99,10 @@ require_once __DIR__ . '/../src/partials/header.php';
       <button class="btn btn-primary" type="submit">Valider</button>
     </div>
   </form>
+
+
+    <p>Déjà un compte ? <a href="connexion.php">Se connecter ici.</a></p>
+
 </section>
 
 <?php require_once __DIR__ . '/../src/partials/footer.php'; ?>
