@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once __DIR__ . "/../src/validation.php";
 require_once __DIR__ . "/../src/utilisateur.php";
 $erreur = [];
@@ -17,9 +18,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     if (empty($erreur)) {
-        $utilisateur_existe =  trouver_utilisateur($pdo, $donnees['email']);
-        if (!$utilisateur_existe || !password_verify($donnees['pass'], $utilisateur_existe['pass'])) {
+        $fiche_utilisateur =  trouver_utilisateur($pdo, $donnees['email']);
+        if (!$fiche_utilisateur || !password_verify($donnees['pass'], $fiche_utilisateur['pass'])) {
             $erreur['pass'] = 'Identifiants incorrects';
+        } else {
+            $_SESSION['utilisateur_id'] = $fiche_utilisateur['utilisateur_id'];
+            $_SESSION['prenom'] = $fiche_utilisateur['prenom'];
+            $_SESSION['roles_id'] = $fiche_utilisateur['roles_id'];
+            header('Location: index.php');
+            exit;
         }
     }
 }
@@ -29,7 +36,7 @@ require_once __DIR__ . '/../src/partials/header.php';
 ?>
 
 <section class="container py-auto mb-auto mt-auto">
-    <form method="post">
+    <form class="needs-validation" method="post" novalidate>
 
         <fieldset class="border rounded p-3 mt-4 mb-4">
             <legend class="fs-5">Vos identifiants</legend>
