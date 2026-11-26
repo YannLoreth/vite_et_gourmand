@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $donnees['pays'] = 'France';
       }
     } else {
-      $erreur_doublon = 'Un compte existe déjà avec cette adresse email. <a href="mot-de-passe-oublie.php">Mot de passe oublié ?</a>';
+      $erreur_doublon = 'Un compte existe déjà avec cette adresse email. <a href="pass_oublie.php">Mot de passe oublié ?</a>';
     }
   }
 }

@@ -37,3 +37,13 @@ function trouver_utilisateur(PDO $pdo, string $email): array|false
     $stmt_verif->execute(['email' => $email]);
     return $stmt_verif->fetch(PDO::FETCH_ASSOC);
 }
+
+//Enregistrer jeton de réinitialisation MDP
+function enregistrer_jeton(PDO $pdo, int $utilisateur_id, string $jeton): bool
+{
+    $stmt_reinit = $pdo->prepare("UPDATE utilisateur SET jeton_reinit = :jeton, jeton_expiration = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE utilisateur_id = :utilisateur_id");
+    return $stmt_reinit->execute([
+        'jeton' => $jeton,
+        'utilisateur_id' => $utilisateur_id
+    ]);
+}

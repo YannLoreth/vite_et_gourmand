@@ -107,6 +107,8 @@ create table utilisateur
     addresse_postale VARCHAR(100) NOT NULL,
     roles_id INT NOT NULL,
     code_postal VARCHAR(5) NOT NULL,
+    jeton_reinit VARCHAR(64) NULL,
+    jeton_expiration DATETIME NULL,
     Foreign Key (roles_id) 
     REFERENCES roles(roles_id)
 );
